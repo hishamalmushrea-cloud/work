@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d9488" />
+  <meta name="description" content="خطة تنفيذية شاملة لمدة 3 سنوات للتحول من موظف إلى صاحب مشروع ناجح" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="دليل ريادة الأعمال" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg" />
+  <link rel="apple-touch-icon" href="icons/icon-192.svg" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <title>دليل رائد الأعمال</title>
+</head>
+<body>
+  <div id="app">
+    <!-- شاشة البداية -->
+    <div id="splash" class="splash">
+      <div class="splash-logo">
+        <svg viewBox="0 0 200 200" width="120" height="120" aria-hidden="true">
+          <defs>
+            <linearGradient id="sg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#14b8a6"/>
+              <stop offset="100%" stop-color="#0f766e"/>
+            </linearGradient>
+          </defs>
+          <rect x="10" y="10" width="180" height="180" rx="42" fill="url(#sg)"/>
+          <path d="M60 130 L88 88 L112 112 L140 70" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="140" cy="70" r="10" fill="#fbbf24"/>
+        </svg>
+      </div>
+      <h1 class="splash-title">دليل رائد الأعمال</h1>
+      <p class="splash-sub">من موظف إلى صاحب مشروع ناجح</p>
+      <div class="splash-loader"><span></span></div>
+    </div>
+
+    <!-- الترويسة -->
+    <header class="app-header" id="appHeader" hidden>
+      <button id="menuBtn" class="icon-btn" aria-label="القائمة">
+        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+      </button>
+      <div class="header-title">
+        <h1 id="sectionTitle">الرئيسية</h1>
+      </div>
+      <button id="installBtn" class="icon-btn install-btn" hidden aria-label="تثبيت التطبيق">
+        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 3a1 1 0 011 1v9.59l3.3-3.3a1 1 0 111.4 1.42l-5 5a1 1 0 01-1.4 0l-5-5a1 1 0 111.4-1.42l3.3 3.3V4a1 1 0 011-1zM4 19a1 1 0 011-1h14a1 1 0 110 2H5a1 1 0 01-1-1z"/></svg>
+      </button>
+    </header>
+
+    <!-- القائمة الجانبية -->
+    <div id="drawerOverlay" class="drawer-overlay" hidden></div>
+    <nav id="drawer" class="drawer" hidden>
+      <div class="drawer-header">
+        <svg viewBox="0 0 200 200" width="48" height="48">
+          <defs><linearGradient id="sg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#0f766e"/></linearGradient></defs>
+          <rect x="10" y="10" width="180" height="180" rx="42" fill="url(#sg2)"/>
+          <path d="M60 130 L88 88 L112 112 L140 70" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="140" cy="70" r="10" fill="#fbbf24"/>
+        </svg>
+        <div>
+          <h2>دليل رائد الأعمال</h2>
+          <p>خطة 3 سنوات عملية</p>
+        </div>
+      </div>
+      <ul id="navList" class="nav-list"></ul>
+      <div class="drawer-footer">
+        <button id="resetProgress" class="text-btn">إعادة ضبط التقدم</button>
+        <p class="version">الإصدار 1.0 — يعمل بدون إنترنت</p>
+      </div>
+    </nav>
+
+    <!-- المحتوى -->
+    <main id="content" class="content" hidden></main>
+
+    <!-- شريط التنقل السفلي -->
+    <nav class="bottom-nav" id="bottomNav" hidden>
+      <button class="nav-tab active" data-route="home">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>
+        <span>الرئيسية</span>
+      </button>
+      <button class="nav-tab" data-route="plan">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M7 2v2h10V2h2v2h2v18H3V4h2V2zm12 8H5v10h14zM7 6H5v2h14V6h-2v2h-2V6H9v2H7z"/></svg>
+        <span>الخطة</span>
+      </button>
+      <button class="nav-tab" data-route="dashboard">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z"/></svg>
+        <span>متابعتي</span>
+      </button>
+    </nav>
+
+    <!-- زر العودة للأعلى -->
+    <button id="toTop" class="to-top" hidden aria-label="الأعلى">
+      <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M7.4 15.4L12 10.8l4.6 4.6L18 14l-6-6-6 6z"/></svg>
+    </button>
+
+    <div id="toast" class="toast" hidden></div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
