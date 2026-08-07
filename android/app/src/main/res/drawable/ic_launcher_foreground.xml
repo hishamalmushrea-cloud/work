@@ -13,9 +13,7 @@
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:fillType="evenOdd" />
-    <circle
+    <path
         android:fillColor="#FBBF24"
-        android:cx="72"
-        android:cy="38"
-        r="4.5" />
+        android:pathData="M 72,33.5 a 4.5,4.5 0 1,0 0,9 a 4.5,4.5 0 1,0 0,-9" />
 </vector>

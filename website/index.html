@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دليل رائد الأعمال | مدربك الشخصي في جيبك</title>
+  <meta name="description" content="تطبيق دليل رائد الأعمال ليس مجرد كتاب، بل مدرب شخصي يرافقك يومياً لتأسيس مشروعك بنجاح وبدون إنترنت.">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0d9488;
+      --primary-dark: #0f766e;
+      --accent: #f59e0b;
+      --bg: #0f172a;
+      --bg-light: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    
+    /* Header */
+    header {
+      padding: 25px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .logo { font-size: 26px; font-weight: 900; color: var(--accent); display:flex; align-items:center; gap:10px;}
+    .logo-icon { width: 40px; height: 40px; background: var(--primary); border-radius: 12px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; }
+    
+    /* Hero Section */
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 80px 0;
+      position: relative;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -10%; right: -10%;
+      width: 600px; height: 600px; background: var(--primary);
+      filter: blur(150px); opacity: 0.15; z-index: -1; border-radius: 50%;
+    }
+    .hero-content { flex: 1; padding-left: 40px; }
+    .hero h1 {
+      font-size: 56px; font-weight: 900; margin-bottom: 25px;
+      line-height: 1.2;
+    }
+    .hero h1 span { color: var(--accent); position: relative; }
+    .hero h1 span::after {
+      content:''; position:absolute; bottom:5px; left:0; width:100%; height:8px; background:var(--primary); opacity:0.3; border-radius:4px;
+    }
+    .hero p { font-size: 20px; margin-bottom: 40px; color: var(--text-muted); max-width: 90%; }
+    
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px; padding: 18px 40px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #fff;
+      font-size: 18px; font-weight: 700; text-decoration: none;
+      border-radius: 50px; transition: 0.3s;
+      box-shadow: 0 10px 25px rgba(13, 148, 136, 0.4);
+    }
+    .btn:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(13, 148, 136, 0.6); }
+    .btn svg { width: 24px; height: 24px; fill: currentColor; }
+    
+    .hero-image { flex: 1; position: relative; }
+    .hero-image img {
+      width: 100%; max-width: 500px; border-radius: 30px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+      border: 2px solid rgba(255,255,255,0.1);
+      transform: perspective(1000px) rotateY(-15deg);
+      transition: 0.5s;
+    }
+    .hero-image:hover img { transform: perspective(1000px) rotateY(0deg) scale(1.02); }
+
+    /* How it works */
+    .how-it-works { padding: 100px 0; background: var(--bg-light); position: relative; }
+    .section-title { text-align: center; font-size: 38px; margin-bottom: 20px; font-weight: 900; }
+    .section-subtitle { text-align: center; color: var(--text-muted); font-size: 18px; margin-bottom: 60px; }
+    
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+    .step {
+      background: var(--bg); padding: 40px; border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.05); position: relative;
+      overflow: hidden;
+    }
+    .step::before {
+      content:''; position:absolute; top:0; left:0; width:100%; height:4px; background:var(--primary);
+    }
+    .step-icon {
+      width: 60px; height: 60px; background: rgba(13, 148, 136, 0.1);
+      color: var(--primary); border-radius: 16px; display:flex; align-items:center; justify-content:center;
+      font-size: 28px; margin-bottom: 25px;
+    }
+    .step h3 { font-size: 24px; margin-bottom: 15px; }
+    .step p { color: var(--text-muted); }
+
+    /* Highlight Feature */
+    .highlight { padding: 100px 0; }
+    .hl-container { display: flex; align-items: center; justify-content: space-between; gap: 50px; }
+    .hl-text { flex: 1; }
+    .hl-image { flex: 1; }
+    .hl-image img {
+      width: 100%; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .check-list { list-style: none; margin-top: 30px; }
+    .check-list li { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; font-size: 18px; }
+    .check-list li svg { width: 24px; height: 24px; color: var(--accent); flex-shrink: 0; }
+    
+    /* Footer */
+    footer { text-align: center; padding: 40px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 50px; color: #64748b; background: var(--bg-light); }
+    
+    @media(max-width: 900px) {
+      .hero, .hl-container { flex-direction: column; text-align: center; }
+      .hero-content, .hl-text { padding-left: 0; margin-bottom: 50px; }
+      .hero h1 { font-size: 42px; }
+      .hero-image img { transform: none; margin: 0 auto; display: block; }
+      .check-list li { justify-content: center; text-align: right; }
+    }
+  </style>
+</head>
+<body>
+  
+  <header>
+    <div class="container">
+      <div class="logo">
+        <div class="logo-icon">🚀</div>
+        دليل رائد الأعمال
+      </div>
+    </div>
+  </header>
+  
+  <section class="hero container">
+    <div class="hero-content">
+      <h1>ليس مجرد كتاب،<br>بل <span>مدربك الشخصي</span></h1>
+      <p>تطبيق ذكي يحول المعلومات الأكاديمية إلى مهام يومية تفاعلية. راقب تقدمك، تجنب الأخطاء، وابنِ مشروعك بخطوات واثقة.. كل هذا بدون الحاجة للإنترنت، مع خصوصية تامة لبياناتك.</p>
+      
+      <a href="app-release.apk" class="btn" download>
+        <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
+        تحميل التطبيق الآن (APK)
+      </a>
+      <p style="font-size: 14px; color: var(--text-muted); margin-top: 20px;">
+        ✅ مجاني بالكامل &nbsp; • &nbsp; ✅ بدون إعلانات &nbsp; • &nbsp; ✅ يعمل أوفلاين
+      </p>
+    </div>
+    <div class="hero-image">
+      <!-- صورة حقيقية من داخل التطبيق -->
+      <img src="img/app_home.jpg" alt="واجهة المدرب في تطبيق دليل رائد الأعمال">
+    </div>
+  </section>
+  
+  <section class="how-it-works">
+    <div class="container">
+      <h2 class="section-title">كيف يعمل مدربك الشخصي؟</h2>
+      <p class="section-subtitle">نظام التلعيب (Gamification) يضمن لك الاستمرار وعدم الملل</p>
+      
+      <div class="steps">
+        <div class="step">
+          <div class="step-icon">📖</div>
+          <h3>1. تعلم كل يوم</h3>
+          <p>يختار لك التطبيق يومياً درساً سريعاً ومخصصاً (مثل خطأ شائع لتتجنبه، أو مهارة بيعية) لتقرأه في دقيقة واحدة.</p>
+        </div>
+        <div class="step">
+          <div class="step-icon">⚡</div>
+          <h3>2. نفذ مهمة عملية</h3>
+          <p>بناءً على يومك الحالي في الخطة، سيوجهك التطبيق لتنفيذ مهمة محددة (مثل: مراجعة أسعار الموردين، أو كتابة فكرة).</p>
+        </div>
+        <div class="step">
+          <div class="step-icon">🏆</div>
+          <h3>3. اجمع النقاط (XP)</h3>
+          <p>عند إنهائك لمهامك اليومية، ستحصل على نقاط وتزيد من سلسلة التزامك (Streak). ارتقِ في المستويات حتى تصل إلى "رائد أعمال".</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="tour" style="padding: 100px 0; background: var(--bg);">
+    <div class="container">
+      <h2 class="section-title">جولة داخل مدربك الشخصي</h2>
+      <p class="section-subtitle">إليك نظرة حقيقية على ما ستجده بالداخل</p>
+      
+      <!-- 1 -->
+      <div class="hl-container" style="margin-bottom: 80px;">
+        <div class="hl-image"><img src="img/app_home.jpg" alt="واجهة المدرب"></div>
+        <div class="hl-text">
+          <h3 style="font-size:28px; margin-bottom:15px; color:var(--primary);">شاشة المدرب الرئيسية 🎯</h3>
+          <p style="color:var(--text-muted); font-size:18px;">تحية يومية تذكرك بمستواك وعدد أيام التزامك، مع 3 مهام يومية سريعة قابلة للتحديد، ونظام متكامل لتجميع النقاط (XP) وصندوق احتفال عند الإنجاز.</p>
+        </div>
+      </div>
+      
+      <!-- 2 -->
+      <div class="hl-container" style="flex-direction: row-reverse; margin-bottom: 80px;">
+        <div class="hl-image"><img src="img/app_plan.jpg" alt="الخطة الزمنية"></div>
+        <div class="hl-text">
+          <h3 style="font-size:28px; margin-bottom:15px; color:var(--primary);">الخطة الزمنية لـ 3 سنوات 🗓️</h3>
+          <p style="color:var(--text-muted); font-size:18px;">خريطة طريق واقعية مقسمة على 12 ربعاً (Quarter). كل ربع يحتوي على مهام عملية تأخذك من مرحلة الفكرة، إلى التعلم، ثم الإطلاق والتوسع.</p>
+        </div>
+      </div>
+      
+      <!-- 3 -->
+      <div class="hl-container" style="margin-bottom: 80px;">
+        <div class="hl-image"><img src="img/app_dashboard.jpg" alt="لوحة المتابعة والعادات"></div>
+        <div class="hl-text">
+          <h3 style="font-size:28px; margin-bottom:15px; color:var(--primary);">لوحة المتابعة والعادات 📈</h3>
+          <p style="color:var(--text-muted); font-size:18px;">تتبع إنجاز أهدافك وعاداتك اليومية (الصباحية، وأثناء العمل، والمسائية). التطبيق يحسب نسبة إنجازك الكلية بشكل تلقائي ويشجعك على الاستمرار.</p>
+        </div>
+      </div>
+      
+      <!-- 4 -->
+      <div class="hl-container" style="flex-direction: row-reverse; margin-bottom: 80px;">
+        <div class="hl-image"><img src="img/app_mistakes.jpg" alt="100 خطأ للمبتدئين"></div>
+        <div class="hl-text">
+          <h3 style="font-size:28px; margin-bottom:15px; color:var(--primary);">100 خطأ للمبتدئين 🚫</h3>
+          <p style="color:var(--text-muted); font-size:18px;">مكتبة ضخمة لأكثر الأخطاء شيوعاً في ريادة الأعمال، مع إمكانية البحث السريع، وتمييز الأخطاء التي تهمك بنجمة (لتُحفظ في المفضلة) للعودة لها لاحقاً.</p>
+        </div>
+      </div>
+      
+      <!-- 5 -->
+      <div class="hl-container" style="margin-bottom: 40px;">
+        <div class="hl-image"><img src="img/app_notebook.jpg" alt="دفتر أفكاري"></div>
+        <div class="hl-text">
+          <h3 style="font-size:28px; margin-bottom:15px; color:var(--primary);">دفتر أفكاري السري 📓</h3>
+          <p style="color:var(--text-muted); font-size:18px;">مساحة آمنة ومحلية 100% لكتابة أفكارك وملاحظاتك وإجابات أسئلة التأمل. تُحفظ في جهازك فقط، ويمكنك تصديرها كنسخة احتياطية متى شئت.</p>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+  
+  <footer>
+    <div class="container">
+      <div class="logo" style="justify-content:center; margin-bottom: 20px;">
+        <div class="logo-icon" style="width:30px; height:30px; font-size:16px;">🚀</div>
+        دليل رائد الأعمال
+      </div>
+      <p>صُنع بشغف لتمكين رواد الأعمال. جميع البيانات تُحفظ في جهازك فقط.</p>
+      
+      <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <p style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: var(--text);">تواصل مع المطور</p>
+        <div style="display: flex; gap: 25px; justify-content: center; align-items: center; flex-wrap: wrap;">
+          <a href="https://www.instagram.com/eng.almushrea" target="_blank" rel="noopener" style="display:flex; align-items:center; gap:8px; color:var(--primary); text-decoration:none; font-size:16px; padding:10px 20px; background:rgba(13,148,136,0.1); border-radius:50px; transition:0.3s;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            @eng.almushrea
+          </a>
+          <a href="mailto:eng.almushrea@gmail.com" style="display:flex; align-items:center; gap:8px; color:var(--primary); text-decoration:none; font-size:16px; padding:10px 20px; background:rgba(13,148,136,0.1); border-radius:50px; transition:0.3s;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            eng.almushrea@gmail.com
+          </a>
+        </div>
+      </div>
+      
+      <p style="margin-top: 20px;">&copy; 2026. جميع الحقوق محفوظة.</p>
+    </div>
+  </footer>
+</body>
+</html>

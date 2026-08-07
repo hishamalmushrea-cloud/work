@@ -1,4 +1,10 @@
 /* ===== الخطوط والإعدادات العامة ===== */
+@font-face {
+  font-family: 'Cairo';
+  src: url('fonts/Cairo-Variable.ttf') format('truetype');
+  font-weight: 200 1000;
+  font-display: swap;
+}
 :root{
   --teal-50:#f0fdfa; --teal-100:#ccfbf1; --teal-500:#14b8a6; --teal-600:#0d9488; --teal-700:#0f766e; --teal-800:#115e59;
   --amber:#f59e0b; --amber-light:#fbbf24;
@@ -18,7 +24,7 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
 body{
-  font-family:"Segoe UI",Tahoma,"Helvetica Neue",system-ui,sans-serif;
+  font-family:"Cairo", "Segoe UI",Tahoma,"Helvetica Neue",system-ui,sans-serif;
   background:var(--bg); color:var(--text); line-height:1.85;
   -webkit-font-smoothing:antialiased; overflow-x:hidden;
   padding-bottom:env(safe-area-inset-bottom);
@@ -54,6 +60,13 @@ img{max-width:100%}
 .icon-btn{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;transition:background .2s}
 .icon-btn:active{background:rgba(255,255,255,.18)}
 .install-btn{background:rgba(255,255,255,.18)}
+.header-actions { display: flex; align-items: center; gap: 8px; }
+
+/* Text Sizer */
+.app-content { transition: font-size 0.3s; }
+body.text-lg .content, body.text-lg .card p, body.text-lg .card li { font-size: 110%; }
+body.text-sm .content, body.text-sm .card p, body.text-sm .card li { font-size: 90%; }
+
 
 /* ===== القائمة الجانبية ===== */
 .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;opacity:0;transition:opacity .3s}
@@ -280,6 +293,52 @@ td{color:var(--text-soft)}
 .exercise b{color:var(--purple)}
 
 /* استجابة */
+@media(max-width:400px){
+  .hero-stats{flex-direction:column}
+  .drawer-content{width:100%}
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes highlightAnim {
+  0% { transform: scale(1); background: var(--card-bg); }
+  10% { transform: scale(1.05); background: var(--teal-700); box-shadow: 0 0 20px rgba(13, 148, 136, 0.5); }
+  100% { transform: scale(1); background: var(--card-bg); box-shadow: 0 4px 6px var(--shadow); }
+}
+.highlight-anim {
+  animation: highlightAnim 2s ease-out;
+  border: 2px solid var(--teal-500) !important;
+}
+
+/* Modal Styles */
+.coach-modal {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 90%; max-width: 450px; background: var(--bg); border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5); z-index: 2000;
+  display: flex; flex-direction: column; max-height: 85vh;
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px; border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { font-size: 18px; margin: 0; color: var(--text); }
+.modal-body {
+  padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.6;
+}
+.modal-footer {
+  padding: 20px; border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 10px;
+}
+.modal-textarea {
+  width: 100%; height: 120px; background: rgba(0,0,0,0.1); border: 1px solid var(--border);
+  border-radius: 12px; padding: 15px; color: var(--text); font-family: inherit;
+  resize: vertical; margin-top: 15px;
+}
+.modal-textarea:focus { outline: 2px solid var(--primary); }
+
 @media(min-width:640px){
   .section-grid{grid-template-columns:repeat(3,1fr)}
   .kpi-grid{grid-template-columns:repeat(4,1fr)}

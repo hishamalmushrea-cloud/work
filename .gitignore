@@ -20,3 +20,5 @@ Thumbs.db
 
 #Caches
 .cache/
+
+!website/app-release.apk

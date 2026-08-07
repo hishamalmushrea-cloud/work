@@ -20,6 +20,15 @@
   let checked = store.get('re_checks',{});
   let currentYear = store.get('re_year',1);
   let theme = store.get('re_theme','light');
+  let notes = store.get('re_notes',[]);
+  let favorites = store.get('re_favs',[]);
+
+  // Gamification State
+  let currentDay = store.get('re_day', 1);
+  let xp = store.get('re_xp', 0);
+  let streak = store.get('re_streak', 0);
+  let lastLoginDate = store.get('re_last_login', '');
+  let dailyProgress = store.get('re_daily_prog', {lesson:false, task:false, question:false, date:''});
 
   /* ---------- شاشة البداية ---------- */
   window.addEventListener('load', ()=>{
@@ -93,6 +102,68 @@
       }
     });
 
+    // --- الميزات الجديدة ---
+    // الوضع الليلي
+    $('#themeBtn')?.addEventListener('click', () => {
+      theme = theme === 'dark' ? 'light' : 'dark';
+      store.set('re_theme', theme);
+      applyTheme();
+    });
+
+    // حجم الخط
+    let textSizes = ['normal', 'text-lg', 'text-sm'];
+    let currSizeIdx = store.get('re_text_size', 0);
+    const applyTextSize = () => {
+      document.body.classList.remove('text-lg', 'text-sm');
+      if (textSizes[currSizeIdx] !== 'normal') document.body.classList.add(textSizes[currSizeIdx]);
+    };
+    applyTextSize();
+    $('#textSizeBtn')?.addEventListener('click', () => {
+      currSizeIdx = (currSizeIdx + 1) % textSizes.length;
+      store.set('re_text_size', currSizeIdx);
+      applyTextSize();
+      toast(currSizeIdx === 0 ? 'حجم الخط: عادي' : currSizeIdx === 1 ? 'حجم الخط: كبير' : 'حجم الخط: صغير');
+    });
+
+    // تصدير البيانات
+    $('#exportData')?.addEventListener('click', () => {
+      const dataStr = JSON.stringify({ checks: checked, year: currentYear, notes: notes, favs: favorites, day: currentDay, xp: xp, streak: streak });
+      const blob = new Blob([dataStr], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'entrepreneur-guide-backup.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('تم التصدير بنجاح 📁');
+      closeDrawer();
+    });
+
+    // استيراد البيانات
+    $('#importDataBtn')?.addEventListener('click', () => $('#importDataFile').click());
+    $('#importDataFile')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (parsed.checks !== undefined) {
+            checked = parsed.checks; currentYear = parsed.year || 1;
+            notes = parsed.notes || []; favorites = parsed.favs || [];
+            currentDay = parsed.day || 1; xp = parsed.xp || 0; streak = parsed.streak || 0;
+            store.set('re_checks', checked); store.set('re_year', currentYear);
+            store.set('re_notes', notes); store.set('re_favs', favorites);
+            store.set('re_day', currentDay); store.set('re_xp', xp); store.set('re_streak', streak);
+            toast('تم الاستيراد بنجاح ✅');
+            render(currentRoute);
+            closeDrawer();
+          } else { toast('ملف غير صالح ❌'); }
+        } catch(err) { toast('حدث خطأ ❌'); }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
     // التنقل بالتجزئة
     window.addEventListener('hashchange', route);
   }
@@ -111,11 +182,51 @@
   function navigate(route){ currentRoute=route; location.hash=route; }
 
   function route(){
-    const r = (location.hash||'#home').slice(1);
-    currentRoute = SECTIONS.find(s=>s.id===r)?r:'home';
+    const hashStr = location.hash || '#home';
+    const cleanHash = hashStr.slice(1);
+    const path = cleanHash.split('?')[0] || 'home';
+    
+    currentRoute = SECTIONS.find(s=>s.id===path) ? path : 'home';
     updateActiveNav();
     render(currentRoute);
-    window.scrollTo({top:0});
+    
+    // معالجة البارامترات (Deep Linking)
+    const urlParams = new URLSearchParams(cleanHash.split('?')[1] || '');
+    
+    if (currentRoute === 'mistakes') {
+      const targetId = urlParams.get('id');
+      if (targetId) {
+        setTimeout(() => {
+          const el = document.getElementById('err-' + targetId);
+          if(el) {
+            el.scrollIntoView({behavior: 'smooth', block: 'center'});
+            el.classList.add('highlight-anim');
+            setTimeout(() => el.classList.remove('highlight-anim'), 3000);
+          }
+        }, 100);
+      } else {
+        window.scrollTo({top:0});
+      }
+    } 
+    else if (currentRoute === 'notebook') {
+      const q = urlParams.get('q');
+      if (q) {
+        setTimeout(() => {
+          const input = document.getElementById('newNoteTxt');
+          if (input && !input.value) {
+            input.value = "إجابة سؤال (" + q + "): \n";
+            input.focus();
+            input.scrollIntoView({behavior: 'smooth', block: 'center'});
+          }
+        }, 100);
+      } else {
+        window.scrollTo({top:0});
+      }
+    }
+    else {
+      window.scrollTo({top:0});
+    }
+
     if(window.matchMedia('(max-width:899px)').matches) closeDrawer();
   }
 
@@ -133,12 +244,16 @@
       home:renderHome, plan:renderPlan, learning:renderLearning, currentjob:renderCurrentJob,
       personality:renderPersonality, sales:renderSales, money:renderMoney, project:renderProject,
       reputation:renderReputation, mistakes:renderMistakes, books:renderBooks, courses:renderCourses,
-      ai:renderAI, habits:renderHabits, dashboard:renderDashboard, scenarios:renderScenarios, future:renderFuture
+      ai:renderAI, habits:renderHabits, dashboard:renderDashboard, scenarios:renderScenarios, future:renderFuture,
+      notebook:renderNotebook, favorites:renderFavorites
     };
     c.innerHTML = (map[route]||renderHome)();
     if(route==='plan') bindPlanEvents();
     if(route==='dashboard') bindDashboardEvents();
     if(route==='mistakes') bindMistakesSearch();
+    if(route==='notebook') bindNotebookEvents();
+    if(route==='favorites') bindMistakesSearch(); // reuse events for favs if needed
+    if(route==='home') bindHomeEvents();
   }
 
   function toast(msg){
@@ -146,46 +261,184 @@
     clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true, 2200);
   }
 
-  /* ========== الرئيسية ========== */
+  function getLevel(xp) {
+    if (xp < 100) return 'متدرب 🌱';
+    if (xp < 500) return 'مبادر 🚀';
+    if (xp < 1000) return 'صاحب مشروع 💼';
+    return 'رائد أعمال 👑';
+  }
+
+  function getDailyContent(dayIndex) {
+    const lessonIdx = dayIndex % MISTAKES.length;
+    const lesson = MISTAKES[lessonIdx];
+    const allTasks = [...DASHBOARD.daily, ...HABITS.morning, ...HABITS.atWork];
+    const task = allTasks.length ? allTasks[dayIndex % allTasks.length] : "استمر في التعلم";
+    const question = typeof REFLECTIONS !== 'undefined' ? REFLECTIONS[dayIndex % REFLECTIONS.length] : "راجع أهدافك اليوم";
+    return {lesson, lessonIdx, task, question};
+  }
+
   function renderHome(){
-    const totalChecks = countAllChecks();
-    const done = Object.values(checked).filter(Boolean).length;
-    const pct = totalChecks? Math.round(done/totalChecks*100):0;
+    const today = new Date().toLocaleDateString('en-CA');
+    if (lastLoginDate !== today) {
+      const yest = new Date(); yest.setDate(yest.getDate()-1);
+      if (lastLoginDate === yest.toLocaleDateString('en-CA')) {
+        streak++;
+      } else if (lastLoginDate !== '') {
+        streak = 1;
+      } else { streak = 1; }
+      lastLoginDate = today;
+      store.set('re_last_login', lastLoginDate);
+      store.set('re_streak', streak);
+      if(dailyProgress.date !== today) {
+         dailyProgress = {lesson:false, task:false, question:false, date:today};
+         store.set('re_daily_prog', dailyProgress);
+      }
+    }
+
+    const {lesson, task, question} = getDailyContent(currentDay - 1);
+    const level = getLevel(xp);
+    const nextLevelXP = xp < 100 ? 100 : (xp < 500 ? 500 : (xp < 1000 ? 1000 : xp+1));
+    const pct = Math.min(100, Math.round((xp / nextLevelXP) * 100));
+    const isDone = dailyProgress.lesson && dailyProgress.task && dailyProgress.question;
+
+    try { if (window.AndroidApp) window.AndroidApp.setDailyTask(task); } catch(e){}
+
     const tiles = SECTIONS.filter(s=>s.id!=='home').map(s=>`
       <button class="section-tile" data-go="${s.id}">
         <span class="ic ${s.color}">${s.num}</span>
         <span class="t">${s.title}</span>
       </button>`).join('');
+
     return `
-      <section class="hero">
-        <h1>من موظف إلى صاحب مشروع ناجح 🚀</h1>
-        <p>خطة تنفيذية شاملة لمدة 3 سنوات، مبنية على خطوات عملية يومية يمكنك تطبيقها من اليوم. تعمل بدون إنترنت بالكامل.</p>
-        <div class="hero-stats">
-          <div class="hero-stat"><div class="v">3</div><div class="l">سنوات / 144 أسبوع</div></div>
-          <div class="hero-stat"><div class="v">100</div><div class="l">خطأ وكيفية تجنبه</div></div>
-          <div class="hero-stat"><div class="v">17</div><div class="l">محوراً تدريبياً</div></div>
+      <section class="hero coach-hero" style="background: linear-gradient(135deg, var(--teal-700) 0%, var(--teal-500) 100%);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h1 style="font-size:22px; margin-bottom:4px;">أهلاً بك، يا رائد الأعمال!</h1>
+            <p style="margin:0; opacity:0.9;">اليوم هو يومك الـ <b>${currentDay}</b> في رحلتك.</p>
+          </div>
+          <div style="text-align:center; background:rgba(0,0,0,0.2); padding:8px 12px; border-radius:12px;">
+            <div style="font-size:20px;">🔥</div>
+            <div style="font-weight:bold; font-size:12px;">${streak} أيام</div>
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; font-weight:bold;">
+            <span>المستوى: ${level}</span>
+            <span>${xp} / ${nextLevelXP} XP</span>
+          </div>
+          <div class="bar" style="height:8px; background:rgba(255,255,255,0.3); border-radius:4px; overflow:hidden;">
+            <span style="width:${pct}%; background:var(--amber); border-radius:4px; display:block; height:100%; transition:width 0.5s;"></span>
+          </div>
         </div>
       </section>
-      <div class="card">
-        <h2>📈 تقدمك العام</h2>
-        <p>أكملت <b>${done}</b> من <b>${totalChecks}</b> مهمة في لوحة المتابعة.</p>
-        <div class="bar"><span style="width:${pct}%"></span></div>
-        <p style="margin-top:8px;font-size:13px;color:var(--teal-600);font-weight:700">${pct}%</p>
-        <button class="btn-primary" data-go="dashboard" style="margin-top:12px">افتح لوحة المتابعة</button>
+
+      <div class="card coach-card" style="margin-top:-15px; position:relative; z-index:10;">
+        <h2 style="margin-bottom:15px;">🎯 خطة اليوم</h2>
+        
+        <div class="check-item coach-item-wrapper ${dailyProgress.lesson ? 'done' : ''}" style="align-items:flex-start; padding:12px;">
+          <button class="chk coach-chk-btn" data-type="lesson" style="border:none; background:transparent; cursor:pointer; padding:0; margin-left:10px; flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="24" height="24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L20 7"/></svg>
+          </button>
+          <div class="txt coach-txt-btn" data-type="lesson-text" style="cursor:pointer; flex:1;">
+            <b style="color:var(--teal-600)">📖 اقرأ هذا الدرس:</b><br>
+            <span style="font-size:14px;">${esc(lesson.err)}</span>
+          </div>
+        </div>
+
+        <div class="check-item coach-item-wrapper ${dailyProgress.task ? 'done' : ''}" style="align-items:flex-start; padding:12px;">
+          <button class="chk coach-chk-btn" data-type="task" style="border:none; background:transparent; cursor:pointer; padding:0; margin-left:10px; flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="24" height="24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L20 7"/></svg>
+          </button>
+          <div class="txt coach-txt-btn" data-type="task-text" style="cursor:pointer; flex:1;">
+            <b style="color:var(--amber-dark)">⚡ نفذ هذه المهمة:</b><br>
+            <span style="font-size:14px;">${esc(task)}</span>
+          </div>
+        </div>
+
+        <div class="check-item coach-item-wrapper ${dailyProgress.question ? 'done' : ''}" style="align-items:flex-start; padding:12px;">
+          <button class="chk coach-chk-btn" data-type="question" style="border:none; background:transparent; cursor:pointer; padding:0; margin-left:10px; flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="24" height="24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L20 7"/></svg>
+          </button>
+          <div class="txt coach-txt-btn" data-type="question-text" style="cursor:pointer; flex:1;">
+            <b style="color:var(--cyan-700)">🤔 أجب عن هذا السؤال:</b><br>
+            <span style="font-size:14px;">${esc(question)}</span>
+          </div>
+        </div>
+
+        <div id="coachSuccess" style="display:${isDone ? 'block' : 'none'}; margin-top:15px; padding:15px; background:rgba(34,197,94,0.1); color:#166534; border:1px solid rgba(34,197,94,0.3); border-radius:8px; text-align:center; animation:fadeIn 0.5s;">
+          <div style="font-size:30px; margin-bottom:10px;">🎉</div>
+          <h3 style="margin-bottom:10px; color:#15803d">أحسنت! لقد أنهيت يومك.</h3>
+          <button id="nextDayBtn" class="btn-primary" style="background:#16a34a;">انتقل لليوم التالي (+50 XP)</button>
+        </div>
       </div>
-      <div class="section-grid">${tiles}</div>
-      <div class="card" style="margin-top:16px">
-        <h2>💡 كيف تستخدم هذا الدليل؟</h2>
-        <ul>
-          <li>ابدأ بقسم <b>الخطة الزمنية</b> واتبع الأسبوع الحالي.</li>
-          <li>طبّق <b>العادات اليومية</b> في حياتك.</li>
-          <li>استخدم <b>لوحة المتابعة</b> لتراقب إنجازك (يُحفظ تلقائياً على جهازك).</li>
-          <li>راجع <b>الأخطاء الـ100</b> قبل أي قرار كبير.</li>
-          <li>تدرّب على <b>الحالات العملية</b> قبل مواجهتها في الواقع.</li>
-          <li>ثبّت التطبيق على شاشتك الرئيسية من زر التثبيت أعلى للوصول السريع دون نت.</li>
-        </ul>
-        <div class="box tip"><span class="bt">تذكير</span>الخطة خريطة مرنة. عدّلها بما يناسب ظروفك في السعودية، لكن التزم بالمبادئ: تعلّم، ادخر، اخدم العميل بإخلاص، وتوكل على الله.</div>
-      </div>`;
+      
+      <div class="section-grid" style="margin-top:20px;">
+        ${tiles}
+      </div>
+    `;
+  }
+
+  function bindHomeEvents() {
+    const {lesson, lessonIdx, task, question} = getDailyContent(currentDay - 1);
+
+    // Deep Linking on text click
+    $$('.coach-txt-btn').forEach(el => {
+      el.addEventListener('click', () => {
+        const type = el.dataset.type;
+        if(type === 'lesson-text') {
+          navigate('mistakes?id=' + lessonIdx);
+        }
+        else if (type === 'task-text') {
+          navigate('dashboard');
+        }
+        else if (type === 'question-text') {
+          navigate('notebook?q=' + encodeURIComponent(question));
+        }
+      });
+    });
+
+    // Check button click
+    $$('.coach-chk-btn').forEach(el => {
+      el.addEventListener('click', e => {
+        e.preventDefault();
+        const type = el.dataset.type;
+        if(dailyProgress[type]) return; // already done
+
+        dailyProgress[type] = true;
+        store.set('re_daily_prog', dailyProgress);
+        
+        el.closest('.coach-item-wrapper').classList.add('done');
+        xp += 10; // 10 XP per sub-task
+        store.set('re_xp', xp);
+        toast('+10 XP 🌟');
+        
+        if (dailyProgress.lesson && dailyProgress.task && dailyProgress.question) {
+          $('#coachSuccess').style.display = 'block';
+        }
+        // Small delay then update header XP bar
+        setTimeout(()=> {
+           if(currentRoute==='home') {
+               const st = document.documentElement.scrollTop;
+               $('#content').innerHTML = renderHome();
+               bindHomeEvents();
+               document.documentElement.scrollTop = st;
+           }
+        }, 800);
+      });
+    });
+
+    $('#nextDayBtn')?.addEventListener('click', () => {
+       xp += 50;
+       currentDay++;
+       dailyProgress = {lesson:false, task:false, question:false, date: dailyProgress.date};
+       store.set('re_xp', xp);
+       store.set('re_day', currentDay);
+       store.set('re_daily_prog', dailyProgress);
+       toast('يوم جديد، وتحدي جديد! +50 XP 🎉');
+       $('#content').innerHTML = renderHome();
+       bindHomeEvents();
+       window.scrollTo({top:0, behavior:'smooth'});
+    });
   }
 
   function countAllChecks(){
@@ -339,9 +592,20 @@
     return html;
   }
   function renderMistakeList(arr){
-    return arr.map((m,i)=>`<div class="error-item">
-      <div class="et"><span class="num">${i+1}</span><span>${esc(m.err)}</span></div>
-      <div class="sol"><b>✔ الحل:</b> ${esc(m.fix)}</div></div>`).join('');
+    return arr.map((m)=>{
+      const mIdx = MISTAKES.indexOf(m);
+      const isFav = favorites.includes(mIdx);
+      return `<div class="error-item" id="err-${mIdx}">
+      <div class="et" style="justify-content:space-between">
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <span class="num">${mIdx+1}</span><span>${esc(m.err)}</span>
+        </div>
+        <button class="icon-btn fav-btn ${isFav?'active':''}" data-idx="${mIdx}" style="color:${isFav?'var(--amber)':'var(--text-mute)'};background:transparent;">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        </button>
+      </div>
+      <div class="sol"><b>✔ الحل:</b> ${esc(m.fix)}</div></div>`;
+    }).join('');
   }
   function bindMistakesSearch(){
     const inp=$('#errSearch'); if(!inp) return;
@@ -510,13 +774,89 @@
     }
   }
 
-  // تفويض النقر على بطاقات الرئيسية
+  /* ========== دفتر الأفكار ========== */
+  function renderNotebook(){
+    let html = `<div class="sec-intro">دون أفكارك وملاحظاتك هنا. جميع الملاحظات تُحفظ على جهازك فقط بشكل آمن.</div>`;
+    html += `<div class="card" style="margin-bottom:16px;">
+      <textarea id="newNoteTxt" placeholder="اكتب فكرتك أو ملاحظتك هنا..." rows="3" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-family:inherit;resize:vertical;outline:none;margin-bottom:10px;"></textarea>
+      <button id="addNoteBtn" class="btn-primary" style="width:auto;">حفظ الملاحظة</button>
+    </div>`;
+    html += `<div id="notesList">`;
+    if(notes.length===0){
+      html += `<p style="text-align:center;color:var(--text-mute);padding:20px;">لا توجد ملاحظات حالياً.</p>`;
+    } else {
+      notes.forEach((n, i) => {
+        html += `<div class="card" style="position:relative;padding-bottom:10px;margin-bottom:10px;">
+          <p style="white-space:pre-wrap;margin-bottom:8px;font-size:14.5px;">${esc(n.text)}</p>
+          <span style="font-size:11px;color:var(--text-mute)">${esc(n.date)}</span>
+          <button class="icon-btn del-note-btn" data-idx="${i}" style="position:absolute;top:10px;left:10px;width:32px;height:32px;color:var(--rose);background:rgba(225,29,72,.1);">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+          </button>
+        </div>`;
+      });
+    }
+    html += `</div>`;
+    return html;
+  }
+  function bindNotebookEvents(){
+    $('#addNoteBtn')?.addEventListener('click', ()=>{
+      const t = $('#newNoteTxt').value.trim();
+      if(!t) return;
+      notes.unshift({text: t, date: new Date().toLocaleDateString('ar-SA')});
+      store.set('re_notes', notes);
+      toast('تم الحفظ 📓');
+      $('#content').innerHTML = renderNotebook();
+      bindNotebookEvents();
+    });
+    $$('.del-note-btn').forEach(b => b.addEventListener('click', (e)=>{
+      if(!confirm('حذف الملاحظة؟')) return;
+      const idx = parseInt(e.currentTarget.dataset.idx);
+      notes.splice(idx, 1);
+      store.set('re_notes', notes);
+      $('#content').innerHTML = renderNotebook();
+      bindNotebookEvents();
+    }));
+  }
+
+  /* ========== المفضلة ========== */
+  function renderFavorites(){
+    let html = `<div class="sec-intro">الأخطاء والمقالات التي قمت بتفضيلها للرجوع إليها سريعاً.</div>`;
+    const favMistakes = MISTAKES.filter((m,i)=>favorites.includes(i));
+    if(favMistakes.length===0){
+      html += `<p style="text-align:center;color:var(--text-mute);padding:20px;">لا يوجد شيء في المفضلة حالياً.</p>`;
+    } else {
+      html += `<div id="errList">${renderMistakeList(favMistakes)}</div>`;
+    }
+    return html;
+  }
+
+  // تفويض النقر على بطاقات الرئيسية وأزرار المفضلة
   document.addEventListener('click', e=>{
     const go=e.target.closest('[data-go]');
     if(go){ navigate(go.dataset.go); }
     // الأكورديون
     const acc=e.target.closest('.acc-head');
     if(acc){ acc.parentElement.classList.toggle('open'); }
+    // المفضلة
+    const favBtn = e.target.closest('.fav-btn');
+    if(favBtn){
+      const idx = parseInt(favBtn.dataset.idx);
+      if(favorites.includes(idx)){
+        favorites = favorites.filter(id => id !== idx);
+        favBtn.classList.remove('active');
+        favBtn.style.color = 'var(--text-mute)';
+        toast('تم الإزالة من المفضلة 🗑️');
+      } else {
+        favorites.push(idx);
+        favBtn.classList.add('active');
+        favBtn.style.color = 'var(--amber)';
+        toast('تمت الإضافة للمفضلة ⭐');
+      }
+      store.set('re_favs', favorites);
+      if(currentRoute==='favorites') {
+        $('#content').innerHTML = renderFavorites();
+      }
+    }
   });
 
 })();
